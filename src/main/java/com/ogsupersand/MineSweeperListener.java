@@ -35,7 +35,7 @@ public class MineSweeperListener extends ListenerAdapter {
         Scanner scan = new Scanner(fullMessage);
         String command = scan.next();
         int x, y;
-        if (command.equals("minesweeper")) {
+        if (command.equals(Action.START_GAME.toString())) {
             game = new MineSweeperGame();
             game.startNewGame();
         } else {
