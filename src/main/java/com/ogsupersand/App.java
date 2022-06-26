@@ -32,6 +32,7 @@ public class App
             Action.FLAG.toString(), 
             Action.UNFLAG.toString(), 
             Action.CHORD.toString());
+    private static final String COMMAND_TOKEN = "!";
     private static final String DISCORD_CONFIG_PATH = "config.json";
     private static final String BOT_TOKEN_NAME = "botToken";
 
@@ -52,63 +53,57 @@ public class App
             Message msg = event.getMessage();
             String msgString = msg.getContentRaw();
             MessageChannel channel = event.getChannel();
-            if (msg.getContentRaw().equals("!ping")) {
-                
-                long time = System.currentTimeMillis();
-                channel.sendMessage("Pong!")
-                        .queue(response -> {
-                            response.editMessageFormat("Pong: %d ms", System.currentTimeMillis() - time).queue();
-                        });
-            }
 
-            if (!msgString.startsWith("!")) {
+            if (!msgString.startsWith(COMMAND_TOKEN)) {
                 return;
             }
             System.out.println(msgString);
-            String fullMessage = msgString.substring(1);
+            String fullMessage = msgString.substring(COMMAND_TOKEN.length());
             Scanner scan = new Scanner(fullMessage);
             String command = scan.next();
             int x, y;
-            if (command.equals("minesweeper"))
-            try {
-                switch (command) {
-                    case "minesweeper":
-                        game = new MineSweeperGame();
-                        game.startNewGame();
-                        sendMessage(channel, game.toString());
-                        break;
-                    case "dig":
-                        x = scan.nextInt();
-                        y = scan.nextInt();
-                        game.uncover(new Point(x, y));
-                        sendMessage(channel, game.toString());
-                        break;
-                    case "flag":
-                        x = scan.nextInt();
-                        y = scan.nextInt();
-                        game.flag(new Point(x, y));
-                        sendMessage(channel, game.toString());
-                        break;
-                    case "unflag":
-                        x = scan.nextInt();
-                        y = scan.nextInt();
-                        game.unflag(new Point(x, y));
-                        sendMessage(channel, game.toString());
-                        break;
+            if (command.equals("minesweeper")) {
+                game = new MineSweeperGame();
+                game.startNewGame();
+            } else {
+                try {
+                    x = scan.nextInt();
+                    y = scan.nextInt();
+                    Point p = new Point(x, y);
+                    if (command.equals(Action.UNCOVER.toString())) {
+                        if (game.uncover(p)) {
+                            sendMessage(channel, 
+                                    String.format("You lose! Play again with command %s", 
+                                            String.format("%s%s", COMMAND_TOKEN, Action.START_GAME)));
+                        } else if (game.isGameWon()) {
+                            sendMessage(channel, 
+                                    String.format("You win! Play again with command %s", 
+                                            String.format("%s%s", COMMAND_TOKEN, Action.START_GAME)));
+                        }
+                    } else if (command.equals(Action.FLAG.toString())) {
+                        game.flag(p);
+                    } else if (command.equals(Action.UNFLAG.toString())) {
+                        game.unflag(p);
+                    } else if (command.equals(Action.CHORD.toString())) {
+                        game.chord(p);
+                    }
+                } catch (InvalidMoveException e) {
+                    sendMessage(channel, String.format("Invalid move! %s", e.getMessage()));
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    sendMessage(channel, 
+                            String.format("Couldn't understand request, please choose out of %s\nReceived %s: %s", 
+                            VALID_ACTIONS, e.getClass(), e.getMessage()));
+                    e.printStackTrace();
                 }
-            } catch (InvalidMoveException e) {
-                sendMessage(channel, String.format("Invalid move! %s", e.getMessage()));
-                e.printStackTrace();
-            } catch (Exception e) {
-                sendMessage(channel, 
-                        String.format("Couldn't understand request, please choose out of %s\nReceived %s: %s", 
-                        VALID_ACTIONS, e.getClass(), e.getMessage()));
-                e.printStackTrace();
+            }
+            sendMessage(channel, game.toString());
+            if (scan != null) {
+                scan.close();
             }
         }
 
         private void sendMessage(MessageChannel channel, String s) {
-            long time = System.currentTimeMillis();
             channel.sendMessage(s).queue();
         }
     }

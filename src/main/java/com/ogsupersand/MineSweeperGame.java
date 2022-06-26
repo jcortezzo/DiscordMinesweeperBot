@@ -20,6 +20,8 @@ public class MineSweeperGame {
     protected static final int HEIGHT = 9;
     protected static final int WIDTH = 9;
 
+    private int uncoveredTiles;
+
     public MineSweeperGame() {
 
     }
@@ -29,6 +31,7 @@ public class MineSweeperGame {
         allTiles = new HashSet<>();
         mines = new HashSet<>();
         isGameRunning = true;
+        uncoveredTiles = 0;
 
         for (int y = 0; y < HEIGHT; y++) {
             for (int x = 0; x < WIDTH; x++) {
@@ -50,6 +53,10 @@ public class MineSweeperGame {
         }
 
         board.keySet().stream().forEach(point -> reevaluateTile(point));
+    }
+
+    public boolean isGameWon() {
+        return uncoveredTiles >= HEIGHT * WIDTH - NUM_MINES;
     }
 
     private void reevaluateTile(Point p) {
@@ -111,7 +118,7 @@ public class MineSweeperGame {
             t.isFlagged()) {
             return;
         }
-
+        uncoveredTiles++;
         closed.add(p);
         t.uncover();
         if (t.isEmpty()) {
