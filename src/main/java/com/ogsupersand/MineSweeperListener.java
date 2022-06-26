@@ -92,6 +92,7 @@ public class MineSweeperListener extends ListenerAdapter {
      *  IMPORTANT NOTE: There seems to be an emoji cap to Discord messages.
      *  Example board: 12x15 shows that it starts truncating the coords. 
      *  We will keep the board 9x9 then.
+     *  FOLLOW-UP: Wrapping the board in code seems to work (```)
      * 
      * @param channel
      * @return
@@ -130,20 +131,17 @@ public class MineSweeperListener extends ListenerAdapter {
         for (int i = 0; i < game.WIDTH; i++) xAxis.add("" + i);
         int maxXCoordDigits = ((game.WIDTH - 1) + "").length();
         for (int i = 0; i < game.WIDTH; i++) xAxis.set(i, Strings.repeat("0", maxXCoordDigits - xAxis.get(i).length()) + i);
-        //System.out.println(xAxis);
         for (int i = 0; i < maxXCoordDigits; i++) {
             String nextLine = Strings.repeat(separator, offset);
             for (String num : xAxis) {
                 nextLine += "" + emojiMap.get(Integer.parseInt("" + num.charAt(i)));
-                //System.out.println(nextLine);
-                // System.out.print(Integer.parseInt("" + num.charAt(i)));
             }
             result += nextLine + "\n";
-            // sendMessage(channel, nextLine + "\n");
-            // sendMessage(channel, result);
-            // System.out.println("");
         }
-        return result;
+        // There seems to be an emoji limit per message which is cutting
+        // off large boards. We can circumvent this by encasing our board
+        // in code with "```".
+        return String.format("```%n%s%n```", result);
     }
 
     private String getEmojiRepresentation(int n) {
