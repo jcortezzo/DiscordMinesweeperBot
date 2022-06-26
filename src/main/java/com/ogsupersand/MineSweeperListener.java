@@ -1,7 +1,14 @@
 package com.ogsupersand;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.google.common.base.Strings;
+
 import java.awt.Point;
 
 import net.dv8tion.jda.api.entities.Message;
@@ -70,7 +77,7 @@ public class MineSweeperListener extends ListenerAdapter {
                 e.printStackTrace();
             }
         }
-        sendMessage(channel, game.toString());
+        sendMessage(channel, getMineSweeperBoardWithCoordinates(channel));//game.toString());
         if (scan != null) {
             scan.close();
         }
@@ -79,4 +86,91 @@ public class MineSweeperListener extends ListenerAdapter {
     private void sendMessage(MessageChannel channel, String s) {
         channel.sendMessage(s).queue();
     }
+
+    /**
+     * IN-PROGRESS: I'm only adding channel to test sending messages through here.
+     *  IMPORTANT NOTE: There seems to be an emoji cap to Discord messages.
+     *  Example board: 12x15 shows that it starts truncating the coords. 
+     *  We will keep the board 9x9 then.
+     * 
+     * @param channel
+     * @return
+     */
+    private String getMineSweeperBoardWithCoordinates(MessageChannel channel) {
+        String board = game.toString();
+        String separator = "⬛";
+        String result = "";
+
+        Scanner lineScan = new Scanner(board);
+        int index = 0;
+
+        // y-axis
+        List<String> yAxis = new ArrayList<>();
+        for (int i = 0; i < game.HEIGHT; i++) yAxis.add("" + i);
+        int maxYCoordDigits = ((game.HEIGHT - 1) + "").length();
+        for (int i = 0; i < game.HEIGHT; i++) yAxis.set(i, Strings.repeat("0", maxYCoordDigits - yAxis.get(i).length()) + i);
+        while (lineScan.hasNext()) {
+            String number = "";
+            for (char c : yAxis.get(index).toCharArray()) {
+                number += emojiMap.get(Integer.parseInt("" + c));
+            }
+            String prepend = String.format("%s%s", number, separator);
+            String newLine = prepend + lineScan.nextLine() + "\n";
+            result += newLine;
+            index++;
+        }
+        lineScan.close();
+
+        // x-axis
+        // axis line
+        int offset = maxYCoordDigits + 1;
+        result += Strings.repeat(separator, game.WIDTH + offset) + "\n";
+
+        List<String> xAxis = new ArrayList<>();
+        for (int i = 0; i < game.WIDTH; i++) xAxis.add("" + i);
+        int maxXCoordDigits = ((game.WIDTH - 1) + "").length();
+        for (int i = 0; i < game.WIDTH; i++) xAxis.set(i, Strings.repeat("0", maxXCoordDigits - xAxis.get(i).length()) + i);
+        //System.out.println(xAxis);
+        for (int i = 0; i < maxXCoordDigits; i++) {
+            String nextLine = Strings.repeat(separator, offset);
+            for (String num : xAxis) {
+                nextLine += "" + emojiMap.get(Integer.parseInt("" + num.charAt(i)));
+                //System.out.println(nextLine);
+                // System.out.print(Integer.parseInt("" + num.charAt(i)));
+            }
+            result += nextLine + "\n";
+            // sendMessage(channel, nextLine + "\n");
+            // sendMessage(channel, result);
+            // System.out.println("");
+        }
+        return result;
+    }
+
+    private String getEmojiRepresentation(int n) {
+        String numberAsString = "" + n;
+        List<String> numberCharactersList = new ArrayList<>();
+        for (char c : numberAsString.toCharArray()) numberCharactersList.add("" + c);
+        List<String> numberAsEmojiList = numberCharactersList.stream()
+                .map(Integer::parseInt)
+                .map(integer -> emojiMap.get(integer))
+                .collect(Collectors.toList());
+        String result = "";
+        for (String s : numberAsEmojiList) {
+            result += s;
+        }
+        return result;
+    }
+
+    private Map<Integer, String> emojiMap = Map.of(
+        0, "0️⃣",
+        1, "1️⃣",
+        2, "2️⃣",
+        3, "3️⃣",
+        4, "4️⃣",
+        5, "5️⃣",
+        6, "6️⃣",
+        7, "7️⃣",
+        8, "8️⃣",
+        9, "9️⃣"
+    );
 }
