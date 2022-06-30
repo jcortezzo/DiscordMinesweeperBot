@@ -98,18 +98,19 @@ public class MineSweeperListener extends ListenerAdapter {
      * @return
      */
     private String getMineSweeperBoardWithCoordinates(MessageChannel channel) {
-        String board = game.toString();
+        String board = reverseBoard();//game.toString();
         String separator = "⬛";
         String result = "";
 
         Scanner lineScan = new Scanner(board);
-        int index = 0;
+        int index = 0;//game.HEIGHT - 1;
 
         // y-axis
         List<String> yAxis = new ArrayList<>();
-        for (int i = 0; i < game.HEIGHT; i++) yAxis.add("" + i);
+        for (int i = game.HEIGHT - 1; i >= 0; i--) yAxis.add("" + i);
         int maxYCoordDigits = ((game.HEIGHT - 1) + "").length();
-        for (int i = 0; i < game.HEIGHT; i++) yAxis.set(i, Strings.repeat("0", maxYCoordDigits - yAxis.get(i).length()) + i);
+        for (int i = 0; i < game.HEIGHT; i++) yAxis.set(i, Strings.repeat("0", maxYCoordDigits - yAxis.get(i).length()) + (yAxis.size()-1 - i));
+        System.out.println(yAxis);
         while (lineScan.hasNext()) {
             String number = "";
             for (char c : yAxis.get(index).toCharArray()) {
@@ -142,6 +143,15 @@ public class MineSweeperListener extends ListenerAdapter {
         // off large boards. We can circumvent this by encasing our board
         // in code with "```".
         return String.format("```%n%s%n```", result);
+    }
+
+    private String reverseBoard() {
+        String reverse = "";
+        Scanner lineScan = new Scanner(game.toString());
+        while (lineScan.hasNext()) {
+            reverse = String.format("%n%s%s", lineScan.nextLine(), reverse);
+        }
+        return reverse.trim();
     }
 
     private String getEmojiRepresentation(int n) {

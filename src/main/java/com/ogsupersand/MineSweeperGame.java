@@ -98,7 +98,7 @@ public class MineSweeperGame {
             // throw new exception
         }
         Tile t = board.get(p);
-        if (t == null || !t.isCovered()) {
+        if (t == null || !t.isCovered() || t.isFlagged()) {
             throw new InvalidMoveException();
         }
         if (t.isMine()) {
@@ -145,9 +145,11 @@ public class MineSweeperGame {
         if (numFlags == t.getValue()) {
             neighbors.stream()
                     .map(point -> board.get(point))
-                    .filter(tile -> !tile.isFlagged())
+                    .filter(tile -> !tile.isFlagged() && tile.isCovered())
                     .map(tile -> board.inverse().get(tile))
                     .forEach(point -> uncover(point));
+        } else {
+            throw new InvalidMoveException(String.format("Cannot chord, the space must touch %s flags!", t.getValue()));
         }
     }
 
@@ -165,7 +167,6 @@ public class MineSweeperGame {
             board.get(p).flag();
 
         }
-        
     }
 
     /**
