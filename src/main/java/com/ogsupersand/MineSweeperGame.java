@@ -130,7 +130,7 @@ public class MineSweeperGame {
         }
     }
 
-    public void chord(Point p) {
+    public boolean chord(Point p) {
         Tile t = board.get(p);
         if (t == null || t.isCovered() || 
             !t.isNumber()) {
@@ -143,11 +143,15 @@ public class MineSweeperGame {
                 .collect(Collectors.toList())
                 .size();
         if (numFlags == t.getValue()) {
-            neighbors.stream()
+            Set<Point> toUncover = neighbors.stream()
                     .map(point -> board.get(point))
                     .filter(tile -> !tile.isFlagged() && tile.isCovered())
                     .map(tile -> board.inverse().get(tile))
-                    .forEach(point -> uncover(point));
+                    .collect(Collectors.toSet());
+            for (Point uncoverPoint : toUncover) {
+                if (uncover(uncoverPoint)) return true;
+            }
+            return false;
         } else {
             throw new InvalidMoveException(String.format("Cannot chord, the space must touch %s flags!", t.getValue()));
         }

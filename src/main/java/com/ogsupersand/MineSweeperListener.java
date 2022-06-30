@@ -40,7 +40,7 @@ public class MineSweeperListener extends ListenerAdapter {
         System.out.println(msgString);
         String fullMessage = msgString.substring(COMMAND_TOKEN.length());
         Scanner scan = new Scanner(fullMessage);
-        String command = scan.next();
+        String command = scan.next().toLowerCase();
         int x, y;
         if (command.equals(Action.START_GAME.toString())) {
             game = new MineSweeperGame();
@@ -65,7 +65,15 @@ public class MineSweeperListener extends ListenerAdapter {
                 } else if (command.equals(Action.UNFLAG.toString())) {
                     game.unflag(p);
                 } else if (command.equals(Action.CHORD.toString())) {
-                    game.chord(p);
+                    if (game.chord(p)) {
+                        sendMessage(channel, 
+                                String.format("You lose! Play again with command %s", 
+                                        String.format("%s%s", COMMAND_TOKEN, Action.START_GAME)));
+                    } else if (game.isGameWon()) {
+                        sendMessage(channel, 
+                                String.format("You win! Play again with command %s", 
+                                        String.format("%s%s", COMMAND_TOKEN, Action.START_GAME)));
+                    }
                 }
             } catch (InvalidMoveException e) {
                 sendMessage(channel, String.format("Invalid move! %s", e.getMessage()));
