@@ -15,19 +15,15 @@ import net.dv8tion.jda.api.JDABuilder;
  */
 public class App 
 {  
-    private static final String DISCORD_CONFIG_PATH = "config.json";
-    private static final String BOT_TOKEN_NAME = "botToken";
+    private static final String BOT_TOKEN_NAME = "ACCESS_TOKEN";
 
     public static void main(String[] args)
     {
         try {
-            JSONObject config = (JSONObject) new JSONParser().parse(new FileReader(DISCORD_CONFIG_PATH));
-            String token = (String) config.get(BOT_TOKEN_NAME);
+            String token = System.getenv(BOT_TOKEN_NAME);
             JDA jda = JDABuilder.createDefault(token)
                     .addEventListeners(new MineSweeperListener())
                     .build();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
