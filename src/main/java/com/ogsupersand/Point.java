@@ -22,4 +22,9 @@ public class Point {
             return this.x == other.x && this.y == other.y;
         }
     }
+
+    @Override
+    public String toString() {
+        return String.format("(%s, %s)", this.x, this.y);
+    }
 }
