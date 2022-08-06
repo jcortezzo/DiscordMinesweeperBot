@@ -1,1 +1,1 @@
-web java -jar target/discordminesweeper-1.jar
+bot java -jar target/discordminesweeper-1.jar
