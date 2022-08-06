@@ -1,1 +1,1 @@
-bot java -jar target/discordminesweeper-1.jar
+worker java -jar target/discordminesweeper-1.jar
