@@ -40,7 +40,6 @@ public class MineSweeperListener extends ListenerAdapter {
         if (!msgString.startsWith(COMMAND_TOKEN)) {
             return;
         }
-        System.out.println(msgString);
         String fullMessage = msgString.substring(COMMAND_TOKEN.length());
         Scanner scan = new Scanner(fullMessage);
         String command = scan.next().toLowerCase();
@@ -134,7 +133,6 @@ public class MineSweeperListener extends ListenerAdapter {
         for (int i = game.HEIGHT - 1; i >= 0; i--) yAxis.add("" + i);
         int maxYCoordDigits = ((game.HEIGHT - 1) + "").length();
         for (int i = 0; i < game.HEIGHT; i++) yAxis.set(i, Strings.repeat("0", maxYCoordDigits - yAxis.get(i).length()) + (yAxis.size()-1 - i));
-        System.out.println(yAxis);
         while (lineScan.hasNext()) {
             String number = "";
             for (char c : yAxis.get(index).toCharArray()) {
