@@ -27,4 +27,12 @@ public class Point {
     public String toString() {
         return String.format("(%s, %s)", this.x, this.y);
     }
+
+    @Override
+    public int hashCode() {
+        // https://stackoverflow.com/questions/9135759/java-hashcode-for-a-point-class
+        int result = x;
+        result = 31 * result + y;
+        return result;
+    }
 }
