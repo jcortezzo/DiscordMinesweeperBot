@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 
-import java.awt.Point;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
