@@ -99,7 +99,11 @@ public class MineSweeperListener extends ListenerAdapter {
                 e.printStackTrace();
             }
         }
-        sendMessage(channel, getMineSweeperBoardWithCoordinates(channel));//game.toString());
+        try {
+            sendMessage(channel, getMineSweeperBoardWithCoordinates(channel));
+        } catch (Exception e) {
+            System.out.println("Couldn't print the current board of the game to channel");
+        }
         if (scan != null) {
             scan.close();
         }
