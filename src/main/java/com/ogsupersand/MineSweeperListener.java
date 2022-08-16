@@ -1,6 +1,7 @@
 package com.ogsupersand;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -27,7 +28,10 @@ public class MineSweeperListener extends ListenerAdapter {
     private static final String COMMAND_TOKEN = "!";
 
     private Map<MessageChannel, MineSweeperGame> gameMap;
-    // private MineSweeperGame game;
+    
+    public MineSweeperListener() {
+        gameMap = new HashMap<>();
+    }
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
