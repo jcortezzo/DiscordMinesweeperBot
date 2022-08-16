@@ -26,7 +26,8 @@ public class MineSweeperListener extends ListenerAdapter {
     
     private static final String COMMAND_TOKEN = "!";
 
-    private MineSweeperGame game;
+    private Map<MessageChannel, MineSweeperGame> gameMap;
+    // private MineSweeperGame game;
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
@@ -43,9 +44,21 @@ public class MineSweeperListener extends ListenerAdapter {
         String command = scan.next().toLowerCase();
         int x, y;
         if (command.equals(Action.START_GAME.toString())) {
-            game = new MineSweeperGame();
+            MineSweeperGame game = new MineSweeperGame();
             game.startNewGame();
+            gameMap.put(channel, game);
         } else {
+            MineSweeperGame game;
+            if (!gameMap.containsKey(channel)) {
+                sendMessage(channel, 
+                        String.format("Game not started in the current channel. Please enter %s%s to start a game.", COMMAND_TOKEN, Action.START_GAME.toString()));
+                if (scan != null) {
+                    scan.close();
+                }
+                return;
+            } else {
+                game = gameMap.get(channel);
+            }
             try {
                 x = scan.nextInt();
                 y = scan.nextInt();
@@ -106,7 +119,8 @@ public class MineSweeperListener extends ListenerAdapter {
      * @return
      */
     private String getMineSweeperBoardWithCoordinates(MessageChannel channel) {
-        String board = reverseBoard();//game.toString();
+        MineSweeperGame game = gameMap.get(channel);
+        String board = reverseBoard(channel);//game.toString();
         String separator = "⬛";
         String result = "";
 
@@ -153,7 +167,8 @@ public class MineSweeperListener extends ListenerAdapter {
         return String.format("```%n%s%n```", result);
     }
 
-    private String reverseBoard() {
+    private String reverseBoard(MessageChannel channel) {
+        MineSweeperGame game = gameMap.get(channel);
         String reverse = "";
         Scanner lineScan = new Scanner(game.toString());
         while (lineScan.hasNext()) {
